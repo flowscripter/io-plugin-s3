@@ -1,0 +1,10 @@
+export { default } from "./src/S3Plugin.ts";
+export { s3IOProviderFactory } from "./src/S3IOProviderFactory.ts";
+export { S3_PART_SIZE_CONSTRAINTS, S3IOProvider } from "./src/S3IOProvider.ts";
+export { type MultipartWriter, type UploadedPart } from "./src/stream/createMultipartWriter.ts";
+export { parseS3LocationString } from "./src/location/parseS3LocationString.ts";
+export { toS3ProviderInputs } from "./src/location/toS3ProviderInputs.ts";
+export { s3ConfigSchema, type S3Config } from "./src/schema/s3ConfigSchema.ts";
+export { s3LocationSchema, type S3Location } from "./src/schema/s3LocationSchema.ts";
+export { s3PropertySchema } from "./src/schema/s3PropertySchema.ts";
+export { s3SettablePropertySchema } from "./src/schema/s3SettablePropertySchema.ts";

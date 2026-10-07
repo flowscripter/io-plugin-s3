@@ -1,0 +1,68 @@
+{
+  "name": "@flowscripter/io-plugin-s3",
+  "version": "0.0.0",
+  "description": "Amazon S3 source/sink plugin for https://github.com/flowscripter/pluggable-io-framework",
+  "keywords": [
+    "aws",
+    "bun",
+    "dynamic",
+    "framework",
+    "io",
+    "pluggable-io-framework",
+    "plugin",
+    "s3"
+  ],
+  "homepage": "https://github.com/flowscripter/io-plugin-s3#readme",
+  "license": "MIT",
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/flowscripter/io-plugin-s3.git"
+  },
+  "files": [
+    "dist/",
+    "README.md",
+    "LICENSE"
+  ],
+  "type": "module",
+  "module": "dist/bundle.js",
+  "exports": {
+    ".": {
+      "default": "./dist/bundle.js"
+    }
+  },
+  "publishConfig": {
+    "access": "public"
+  },
+  "scripts": {
+    "build": "bun build index.ts --outdir ./dist --entry-naming bundle.js --target bun --minify --external \"@flowscripter/dynamic-plugin-framework\"",
+    "test": "bun test"
+  },
+  "dependencies": {
+    "@aws-sdk/client-s3": "^3.1147.0",
+    "@aws-sdk/lib-storage": "^3.1147.0",
+    "@flowscripter/pluggable-io-framework-api": "^3.0.0",
+    "zod": "^4.6.5"
+  },
+  "devDependencies": {
+    "@flowscripter/dynamic-plugin-framework": "^2.2.15",
+    "@types/bun": "^1.4.2",
+    "@types/node": "^26.6.3",
+    "oxfmt": "0.71.0",
+    "oxlint": "1.86.0"
+  },
+  "peerDependencies": {
+    "@flowscripter/dynamic-plugin-framework": "*",
+    "typescript": "^7.0.2"
+  },
+  "pluggable-io-framework": {
+    "extensionPoints": [
+      "@flowscripter/pluggable-io-framework/provider-factory"
+    ]
+  },
+  "typedocOptions": {
+    "readme": "none",
+    "exclude": [
+      "tests/**"
+    ]
+  }
+}
