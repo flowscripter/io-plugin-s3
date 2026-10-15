@@ -1,5 +1,10 @@
 import { describe, expect, test } from "bun:test";
-import { containerPrefix, joinS3Key, normalizeS3Key } from "../../src/util/s3Key.ts";
+import {
+  containerPrefix,
+  isSafeRelativePath,
+  joinS3Key,
+  normalizeS3Key,
+} from "../../src/util/s3Key.ts";
 
 describe("s3Key", () => {
   test("normalizeS3Key strips leading and trailing slashes", () => {
@@ -23,5 +28,17 @@ describe("s3Key", () => {
     );
     expect(normalizeS3Key("/".repeat(200_000))).toBe("");
     expect(performance.now() - start).toBeLessThan(1000);
+  });
+
+  test("isSafeRelativePath accepts normal and nested paths", () => {
+    expect(isSafeRelativePath("a.txt")).toBe(true);
+    expect(isSafeRelativePath("a/b/c.txt")).toBe(true);
+    expect(isSafeRelativePath("a/..b/.c/d..e")).toBe(true);
+  });
+
+  test("isSafeRelativePath rejects dot segments, backslashes and NUL", () => {
+    for (const path of ["..", "../a", "a/../b", "a/..", ".", "./a", "a/./b", "a\\b", "a\0b"]) {
+      expect(isSafeRelativePath(path)).toBe(false);
+    }
   });
 });

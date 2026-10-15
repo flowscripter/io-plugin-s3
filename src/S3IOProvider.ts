@@ -29,7 +29,7 @@ import { createMultipartWriter } from "./stream/createMultipartWriter.ts";
 import { createReadableHandle } from "./stream/createReadableHandle.ts";
 import { createWritableHandle } from "./stream/createWritableHandle.ts";
 import { createS3Client } from "./util/createS3Client.ts";
-import { containerPrefix, joinS3Key, normalizeS3Key } from "./util/s3Key.ts";
+import { containerPrefix, isSafeRelativePath, joinS3Key, normalizeS3Key } from "./util/s3Key.ts";
 import { isNotFound, toIOError } from "./util/toIOError.ts";
 
 const MIB = 1024 * 1024;
@@ -126,7 +126,9 @@ export class S3IOProvider implements IOProvider<PayloadKind.Js> {
   /**
    * Lists the entries under a container. Without `recursive`, only direct
    * children are listed and sub-prefixes are reported as containers. `regex`
-   * is matched against each entry's path relative to the container.
+   * is matched against each entry's path relative to the container. Entries
+   * whose relative path has `.` or `..` segments, backslashes or NUL are
+   * skipped, as the AWS CLI does for `s3 sync`.
    */
   public list(
     key: string,
@@ -153,14 +155,14 @@ export class S3IOProvider implements IOProvider<PayloadKind.Js> {
         );
         for (const common of page.CommonPrefixes ?? []) {
           const path = normalizeS3Key((common.Prefix ?? "").slice(prefix.length));
-          if (path !== "" && (!regex || regex.test(path))) {
+          if (path !== "" && isSafeRelativePath(path) && (!regex || regex.test(path))) {
             yield { path, properties: containerProperties() };
           }
         }
         for (const object of page.Contents ?? []) {
           const relative = (object.Key ?? "").slice(prefix.length);
           const path = normalizeS3Key(relative);
-          if (path === "" || (regex && !regex.test(path))) continue;
+          if (path === "" || !isSafeRelativePath(path) || (regex && !regex.test(path))) continue;
           if (relative.endsWith("/")) {
             yield { path, properties: containerProperties() };
             continue;
