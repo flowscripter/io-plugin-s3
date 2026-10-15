@@ -1,6 +1,6 @@
 {
   "name": "@flowscripter/io-plugin-s3",
-  "version": "1.0.3",
+  "version": "1.0.4",
   "description": "Amazon S3 source/sink plugin for https://github.com/flowscripter/pluggable-io-framework",
   "keywords": [
     "aws",
