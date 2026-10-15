@@ -7,6 +7,7 @@ import {
   TransientIOError,
 } from "@flowscripter/pluggable-io-framework-api";
 import { S3_PART_SIZE_CONSTRAINTS, S3IOProvider } from "../src/S3IOProvider.ts";
+import { isSafeRelativePath } from "../src/util/s3Key.ts";
 import { createFakeS3, type FakeS3 } from "./fixtures/fakeS3.ts";
 
 function setup(pageSize?: number): { s3: FakeS3; provider: S3IOProvider } {
@@ -121,6 +122,43 @@ describe("S3IOProvider listing", () => {
     ]);
     expect(await listPaths(provider, "", { regex: /^dir$/ })).toEqual(["dir/"]);
   });
+
+  const unsafeKeys = [
+    "../evil.txt",
+    "a/../../evil.txt",
+    "./evil.txt",
+    "a/./evil.txt",
+    "a\\..\\evil.txt",
+    "a\0evil.txt",
+    "x/..",
+    "x/../",
+  ];
+
+  for (const unsafe of unsafeKeys) {
+    test(`skips object key ${JSON.stringify(unsafe)} when listing recursively`, async () => {
+      const { s3, provider } = setup();
+      s3.put("dir/ok.txt", "ok");
+      s3.put("dir/sub/nested.txt", "n");
+      s3.put(`dir/${unsafe}`, "bad");
+      expect(await listPaths(provider, "dir", { recursive: true })).toEqual([
+        "ok.txt",
+        "sub/nested.txt",
+      ]);
+    });
+
+    // a prefix is only unsafe when its own (first) segment is
+    const prefixUnsafe = !isSafeRelativePath(unsafe.split("/")[0]!);
+    test.if(prefixUnsafe)(
+      `skips common prefix from key ${JSON.stringify(unsafe)} when listing children`,
+      async () => {
+        const { s3, provider } = setup();
+        s3.put("dir/ok.txt", "ok");
+        s3.put("dir/sub/nested.txt", "n");
+        s3.put(`dir/${unsafe}/child.txt`, "bad");
+        expect(await listPaths(provider, "dir")).toEqual(["ok.txt", "sub/"]);
+      },
+    );
+  }
 });
 
 describe("S3IOProvider changes", () => {

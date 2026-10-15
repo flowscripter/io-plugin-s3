@@ -20,3 +20,12 @@ export function containerPrefix(key: string): string {
   const normalized = normalizeS3Key(key);
   return normalized === "" ? "" : `${normalized}/`;
 }
+
+/**
+ * True if a normalized relative path has no `.` or `..` segments, backslashes
+ * or NUL characters, so it cannot escape a local destination directory.
+ */
+export function isSafeRelativePath(path: string): boolean {
+  if (path.includes("\\") || path.includes("\0")) return false;
+  return !path.split("/").some((segment) => segment === "." || segment === "..");
+}
