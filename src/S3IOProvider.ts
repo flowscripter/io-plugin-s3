@@ -14,16 +14,18 @@ import {
   type EntryProperties,
   type EntryPropertyChanges,
   type IOProvider,
+  type MultipartWriter,
   type PartSizeConstraints,
   PayloadKind,
   PermanentIOError,
   type RangeReadable,
+  type ResumableWritable,
   type ResumeToken,
   type StreamHandle,
 } from "@flowscripter/pluggable-io-framework-api";
 import type { S3Config } from "./schema/s3ConfigSchema.ts";
 import { s3SettablePropertySchema } from "./schema/s3SettablePropertySchema.ts";
-import { createMultipartWriter, type MultipartWriter } from "./stream/createMultipartWriter.ts";
+import { createMultipartWriter } from "./stream/createMultipartWriter.ts";
 import { createReadableHandle } from "./stream/createReadableHandle.ts";
 import { createWritableHandle } from "./stream/createWritableHandle.ts";
 import { createS3Client } from "./util/createS3Client.ts";
@@ -293,7 +295,7 @@ export class S3IOProvider implements IOProvider<PayloadKind.Js> {
     key: string,
     _partSize: number,
     opts?: { resume?: ResumeToken },
-  ): MultipartWriter {
+  ): MultipartWriter<PayloadKind.Js> & ResumableWritable {
     return createMultipartWriter(this.#client, this.bucket, normalizeS3Key(key), opts?.resume);
   }
 

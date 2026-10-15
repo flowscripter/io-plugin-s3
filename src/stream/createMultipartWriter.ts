@@ -7,6 +7,7 @@ import {
 } from "@aws-sdk/client-s3";
 import type {
   Item,
+  MultipartWriter,
   Part,
   PayloadKind,
   ResumableWritable,
@@ -20,10 +21,6 @@ export interface UploadedPart {
   readonly partNumber: number;
   readonly etag: string;
   readonly size: number;
-}
-
-export interface MultipartWriter extends ResumableWritable {
-  write(parts: AsyncIterable<Part<PayloadKind.Js>>): Promise<void>;
 }
 
 async function listUploadedParts(
@@ -72,7 +69,7 @@ export function createMultipartWriter(
   bucket: string,
   key: string,
   resume?: ResumeToken,
-): MultipartWriter {
+): MultipartWriter<PayloadKind.Js> & ResumableWritable {
   const resumeState = resume?.state as { uploadId?: string } | undefined;
   let uploadId = resumeState?.uploadId;
   const uploaded = new Map<number, UploadedPart>();

@@ -1,6 +1,10 @@
 /** Removes leading and trailing `/` - object keys are not paths. */
 export function normalizeS3Key(key: string): string {
-  return key.replace(/^\/+|\/+$/g, "");
+  let start = 0;
+  let end = key.length;
+  while (start < end && key[start] === "/") start++;
+  while (end > start && key[end - 1] === "/") end--;
+  return key.slice(start, end);
 }
 
 /** Joins key segments with `/`, ignoring empty segments. */
