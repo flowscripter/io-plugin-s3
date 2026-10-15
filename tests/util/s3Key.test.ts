@@ -14,4 +14,14 @@ describe("s3Key", () => {
     expect(containerPrefix("a")).toBe("a/");
     expect(containerPrefix("/")).toBe("");
   });
+
+  test("normalizeS3Key handles very long runs of slashes in linear time", () => {
+    const start = performance.now();
+    expect(normalizeS3Key(`${"/".repeat(200_000)}a${"/".repeat(200_000)}`)).toBe("a");
+    expect(normalizeS3Key(`${"/".repeat(200_000)}x/y${"/".repeat(200_000)}b`)).toBe(
+      `x/y${"/".repeat(200_000)}b`,
+    );
+    expect(normalizeS3Key("/".repeat(200_000))).toBe("");
+    expect(performance.now() - start).toBeLessThan(1000);
+  });
 });
