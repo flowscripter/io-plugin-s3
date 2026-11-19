@@ -38,17 +38,17 @@
     "test": "bun test"
   },
   "dependencies": {
-    "@aws-sdk/client-s3": "^3.1169.0",
-    "@aws-sdk/lib-storage": "^3.1169.0",
-    "@flowscripter/pluggable-io-framework-api": "^3.1.10",
+    "@aws-sdk/client-s3": "^3.1172.0",
+    "@aws-sdk/lib-storage": "^3.1172.0",
+    "@flowscripter/pluggable-io-framework-api": "^3.1.11",
     "zod": "^4.6.7"
   },
   "devDependencies": {
     "@flowscripter/dynamic-plugin-framework": "^2.3.6",
     "@types/bun": "^1.4.4",
     "@types/node": "^26.6.6",
-    "oxfmt": "0.78.0",
-    "oxlint": "1.93.0"
+    "oxfmt": "0.79.0",
+    "oxlint": "1.94.0"
   },
   "peerDependencies": {
     "@flowscripter/dynamic-plugin-framework": "*",
